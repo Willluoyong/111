@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
-    <button @click="dialogVisible = true">设置管家婆cookie</button>
-    <button @click="wlndialogVisible = true">设置万里牛cookie</button>
+    <button @click="gjpCookieDialoge = true">设置管家婆cookie</button>
+    <button @click="wlnCookieDialoge = true">设置万里牛cookie</button>
     <div class="query-bar">
       <span>条形码</span>
       <el-input
@@ -49,32 +49,31 @@
         layout="total, prev, pager, next"
         :total="total"
       ></el-pagination>
-      <el-dialog title="管家婆" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-        <span slot="footer" class="dialog-footer">
-          <el-form ref="gjpform" :model="gjpform" label-width="80px">
+      <el-dialog title="管家婆" :visible.sync="gjpCookieDialoge" width="30%" >
+          <el-form ref="gjpCookieForm" :model="gjpCookieForm" label-width="80px">
             <el-form-item label="内容">
-              <el-input type="textarea" v-model="gjpform.cook"></el-input>
+              <el-input type="textarea" v-model="gjpCookieForm.cook"></el-input>
             </el-form-item>
           </el-form>
-          <el-button @click="dialogVisible = false">取 消</el-button>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="gjpCookieDialoge = false">取 消</el-button>
           <el-button type="primary" @click="gjpSure()">确 定</el-button>
         </span>
       </el-dialog>
       <el-dialog
         title="万里牛"
-        :visible.sync="wlndialogVisible"
+        :visible.sync="wlnCookieDialoge"
         width="30%"
-        :before-close="handleClose"
       >
-        <span slot="footer" class="dialog-footer">
-          <el-form ref="wlnform" :model="wlnform" label-width="80px">
+          <el-form ref="wlnCookieForm" :model="wlnCookieForm" label-width="80px">
             <el-form-item label="内容">
-              <el-input type="textarea" v-model="wlnform.cook"></el-input>
+              <el-input type="textarea" v-model="wlnCookieForm.cook"></el-input>
             </el-form-item>
           </el-form>
-          <el-button @click="wlndialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="wlnSure()">确 定</el-button>
-        </span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="wlnCookieDialoge = false">取 消</el-button>
+            <el-button type="primary" @click="wlnSure()">确 定</el-button>
+          </span>
       </el-dialog>
       <el-dialog title="管家婆查看" :visible.sync="gjpListDialoge">
         <el-table :data="gjpData">
@@ -104,8 +103,8 @@ export default {
       tableData: [],
       gjpData: [],
       wlnData:[],
-      dialogVisible: false, //管家婆对话框
-      wlndialogVisible: false, // 万里牛对话框
+      gjpCookieDialoge: false, //管家婆对话框
+      wlnCookieDialoge: false, // 万里牛对话框
       gjpListDialoge: false,  // 查看管家婆
       wlnListDialoge: false,  // 查看管家婆
       dialogFormVisible: false,
@@ -119,10 +118,10 @@ export default {
         resource: "",
         desc: ""
       },
-      gjpform: {
+      gjpCookieForm: {
         cook: ""
       },
-      wlnform: {
+      wlnCookieForm: {
         cook: ""
       },
       productType: "",
@@ -140,7 +139,7 @@ export default {
      gjpSeeInfo(index, row) {
         console.log(index, row);
         this.gjpListDialoge = true;
-        let url = "http://112.74.57.236:1000/abutment/gjpProductC";
+        let url = "/gjpProductC";
         this.axios.get(url+''+'?pid='+row.pid).then(res => {
             // debugger
           if (res.data.code == 200) {
@@ -154,7 +153,7 @@ export default {
      wlnSeeInfo(index, row) {
         console.log(index, row);
         this.wlnListDialoge = true;
-        let url = "http://112.74.57.236:1000/abutment/wlnProductC";
+        let url = "/wlnProductC";
         let params = {
           itemID: row.itemID
         };
@@ -178,13 +177,13 @@ export default {
       this.getList();
     },
     gjpSure() {
-      let url = "http://112.74.57.236:1000/abutment/setGjpCookie";
+      let url = "/setGjpCookie";
       let params = {
-        cookie: this.gjpform.cook
+        cookie: this.gjpCookieForm.cook
       };
       this.axios.post(url, params).then(res => {
         if (res.data.code == 200) {
-          this.dialogVisible = false
+          this.gjpCookieDialoge = false
           this.$message.success("设置成功！");
         } else {
           this.$message.error(res.data.msg);
@@ -192,13 +191,13 @@ export default {
       });
     },
     wlnSure() {
-      let url = "http://112.74.57.236:1000/abutment/setWlnCookie";
+      let url = "/setWlnCookie";
       let params = {
-        cookie: this.wlnform.cook
+        cookie: this.wlnCookieForm.cook
       };
       this.axios.post(url, params).then(res => {
         if (res.data.code == 200) {
-          this.wlndialogVisible = false
+          this.wlnCookieDialoge = false
           this.$message.success("设置成功！");
         } else {
           this.$message.error(res.data.msg);
@@ -213,7 +212,7 @@ export default {
         .catch(_ => {});
     },
     getList() {
-      let url = "http://112.74.57.236:1000/abutment/getProducts";
+      let url = "/getProducts";
       let params = {
         pageNo: this.pageNo,
         pageSize: this.pageSize,
@@ -225,8 +224,6 @@ export default {
           this.tableData = res.data.data;
           this.total = res.data.total;
           console.log(this.tableData);
-          // debugger
-          // sessionStorage.setItem('keyGen', JSON.stringify(res.data.data))
           this.$message.success("登录成功！");
         } else {
           this.$message.error(res.data.msg);

@@ -7,6 +7,10 @@ import App from './App'
 import router from './router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+
+axios.defaults.baseURL = 'http://112.74.57.236:1000/abutment'  //这里修改基础路径
+Vue.prototype.axios = axios
+
 Vue.use(VueAxios, axios)
 Vue.use(ElementUI);
 
